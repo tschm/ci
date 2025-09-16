@@ -28,8 +28,23 @@ RUN apt-get update && apt-get install -y \
     nano \
     ssh \
     rsync \
-    ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    ca-certificates
+
+# Install tectonic
+RUN apt-get install -y --no-install-recommends \
+    xz-utils \
+    fontconfig \
+    libfreetype6 \
+    libgraphite2-3 \
+    libharfbuzz0b \
+    libpng16-16 \
+    libx11-6 \
+    libxext6 \
+    libxrender1 \
+    perl \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net | sh \
+    && export PATH=$PWD:$PATH \
 
 # Install common Python packages for CI/CD
 # Using trusted hosts to handle SSL issues in some environments
