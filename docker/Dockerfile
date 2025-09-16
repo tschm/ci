@@ -57,4 +57,3 @@ CMD ["/bin/bash"]
 # Labels for metadata
 LABEL maintainer="Thomas Schmelzer"
 LABEL description="CI/CD container with common tools and utilities"
-#LABEL version="1.0.0"
