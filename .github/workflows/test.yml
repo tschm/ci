@@ -9,15 +9,24 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+<<<<<<< HEAD
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+=======
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)
     - name: Set up Podman
       run: |
         sudo apt-get update
         sudo apt-get install -y podman
+<<<<<<< HEAD
 
     - name: Build test image
       run: |
@@ -27,6 +36,17 @@ jobs:
       run: |
         echo "Testing container functionality..."
 
+=======
+        
+    - name: Build test image
+      run: |
+        podman build --cgroup-manager=cgroupfs -t ci-container-test:latest .
+        
+    - name: Run comprehensive tests
+      run: |
+        echo "Testing container functionality..."
+        
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)
         # Test basic commands and tools
         echo "=== Testing basic tools ==="
         podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
@@ -39,7 +59,11 @@ jobs:
           which curl && echo '✓ Curl found'
           which jq && echo '✓ JQ found'
         "
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)
         # Test Python environment
         echo "=== Testing Python environment ==="
         podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
@@ -47,14 +71,22 @@ jobs:
           pip3 --version
           python3 -c 'import sys; print(f\"Python {sys.version}\")'
         "
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)
         # Test Node.js environment
         echo "=== Testing Node.js environment ==="
         podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
           node --version
           npm --version
         "
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)
         # Test installed Python packages
         echo "=== Testing Python packages ==="
         podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
@@ -62,7 +94,11 @@ jobs:
           python3 -c 'import requests; print(\"requests:\", requests.__version__)'
           python3 -c 'import yaml; print(\"pyyaml available\")'
         "
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)
         # Test user permissions
         echo "=== Testing user setup ==="
         podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
@@ -71,7 +107,11 @@ jobs:
           pwd
           ls -la /workspace
         "
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)
         # Test that we can create files in workspace
         echo "=== Testing workspace permissions ==="
         podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
@@ -80,7 +120,11 @@ jobs:
           rm /workspace/test.txt
           echo '✓ Workspace write permissions OK'
         "
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)
     - name: Security scan
       run: |
         echo "=== Running basic security checks ==="
@@ -93,8 +137,16 @@ jobs:
             echo '✓ Container is running as non-root user'
           fi
         "
+<<<<<<< HEAD
 
     - name: Performance test
       run: |
         echo "=== Testing container startup time ==="
         time podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest echo "Container started successfully"
+=======
+        
+    - name: Performance test
+      run: |
+        echo "=== Testing container startup time ==="
+        time podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest echo "Container started successfully"
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)

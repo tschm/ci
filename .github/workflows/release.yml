@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 name: Release Workflow
 
 on:
@@ -78,3 +79,135 @@ jobs:
           generate_release_notes: true
           body_path: docker-image-info.md
           files: "docker/**"
+=======
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to release'
+        required: true
+        default: 'latest'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+        
+    - name: Log in to Container Registry
+      run: |
+        echo ${{ secrets.GITHUB_TOKEN }} | podman login ${{ env.REGISTRY }} -u ${{ github.actor }} --password-stdin
+        
+    - name: Extract metadata
+      id: meta
+      run: |
+        if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          TAG="${{ github.event.inputs.tag }}"
+        else
+          TAG=${GITHUB_REF#refs/tags/}
+        fi
+        
+        echo "tag=${TAG}" >> $GITHUB_OUTPUT
+        echo "image=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> $GITHUB_OUTPUT
+        echo "version=${TAG#v}" >> $GITHUB_OUTPUT
+        
+    - name: Build and tag image
+      run: |
+        # Build the image
+        podman build --cgroup-manager=cgroupfs -t ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }} .
+        podman build --cgroup-manager=cgroupfs -t ${{ steps.meta.outputs.image }}:latest .
+        
+        # Add version label if it's a versioned release
+        if [[ "${{ steps.meta.outputs.tag }}" =~ ^v[0-9] ]]; then
+          podman build --cgroup-manager=cgroupfs -t ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }} .
+        fi
+        
+    - name: Test image before release
+      run: |
+        echo "Running final tests before release..."
+        podman run --cgroup-manager=cgroupfs --rm ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }} bash -c "
+          python3 --version
+          node --version
+          git --version
+          echo 'All tools available in release image'
+        "
+        
+    - name: Push image to registry
+      run: |
+        echo "Pushing image to registry..."
+        podman push ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+        podman push ${{ steps.meta.outputs.image }}:latest
+        
+        # Push versioned tag if applicable
+        if [[ "${{ steps.meta.outputs.tag }}" =~ ^v[0-9] ]]; then
+          podman push ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}
+        fi
+        
+    - name: Generate release notes
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      run: |
+        cat > release-notes.md << EOF
+        # Release ${{ steps.meta.outputs.tag }}
+        
+        ## Container Image
+        
+        The CI/CD container image has been built and published to:
+        
+        - \`${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}\`
+        - \`${{ steps.meta.outputs.image }}:latest\`
+        - \`${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.version }}\`
+        
+        ## Usage
+        
+        Pull and run the container:
+        
+        \`\`\`bash
+        podman pull ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+        podman run -it ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
+        \`\`\`
+        
+        ## Included Tools
+        
+        - Python 3 with pip and common packages (pytest, requests, coverage, etc.)
+        - Node.js with npm and global packages (eslint, prettier, typescript)
+        - Git, curl, jq, and other essential CI/CD tools
+        - Build tools and utilities
+        
+        ## Security
+        
+        - Runs as non-root user \`ciuser\`
+        - Minimal attack surface
+        - Regular security updates
+        EOF
+        
+    - name: Create GitHub Release
+      if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.meta.outputs.tag }}
+        release_name: Release ${{ steps.meta.outputs.tag }}
+        body_path: release-notes.md
+        draft: false
+        prerelease: false
+>>>>>>> 5ff617d (Complete CI/CD container implementation with Dockerfile, workflows, and documentation)
