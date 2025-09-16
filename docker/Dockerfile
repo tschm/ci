@@ -39,17 +39,32 @@ RUN pip3 install --no-cache-dir --trusted-host pypi.org --trusted-host pypi.pyth
     pyyaml || \
     echo "Warning: Some Python packages may not have been installed due to network issues"
 
+# Ensure /usr/local/bin exists (normally already present in most bases)
+# RUN mkdir -p /usr/local/bin && chmod 755 /usr/local/bin
+
+
+# Install uv and uvx from astral-sh image
+COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /usr/local/bin/
+
+# Verify installation
+RUN uv --version && uvx --version
+
 # Create a non-root user for security
 RUN useradd -m -s /bin/bash ciuser
 
 # Set working directory
 WORKDIR /workspace
 
-# Change ownership of workspace to ciuser
-RUN chown ciuser:ciuser /workspace
+# Change ownership of workspace to ciuser and ensure access to /usr/local/bin
+RUN chown ciuser:ciuser /workspace && \
+    chmod -R 755 /usr/local/bin && \
+    chown -R root:root /usr/local/bin
 
 # Switch to non-root user
 USER ciuser
+
+# Add /usr/local/bin to PATH
+ENV PATH="/usr/local/bin:${PATH}"
 
 # Default command
 CMD ["/bin/bash"]
