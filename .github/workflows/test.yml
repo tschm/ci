@@ -1,0 +1,100 @@
+name: Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+        
+    - name: Build test image
+      run: |
+        podman build --cgroup-manager=cgroupfs -t ci-container-test:latest .
+        
+    - name: Run comprehensive tests
+      run: |
+        echo "Testing container functionality..."
+        
+        # Test basic commands and tools
+        echo "=== Testing basic tools ==="
+        podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
+          echo 'Testing basic commands:'
+          which python3 && echo '✓ Python3 found'
+          which pip3 && echo '✓ Pip3 found'
+          which node && echo '✓ Node.js found'
+          which npm && echo '✓ NPM found'
+          which git && echo '✓ Git found'
+          which curl && echo '✓ Curl found'
+          which jq && echo '✓ JQ found'
+        "
+        
+        # Test Python environment
+        echo "=== Testing Python environment ==="
+        podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
+          python3 --version
+          pip3 --version
+          python3 -c 'import sys; print(f\"Python {sys.version}\")'
+        "
+        
+        # Test Node.js environment
+        echo "=== Testing Node.js environment ==="
+        podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
+          node --version
+          npm --version
+        "
+        
+        # Test installed Python packages
+        echo "=== Testing Python packages ==="
+        podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
+          python3 -c 'import pytest; print(\"pytest:\", pytest.__version__)'
+          python3 -c 'import requests; print(\"requests:\", requests.__version__)'
+          python3 -c 'import yaml; print(\"pyyaml available\")'
+        "
+        
+        # Test user permissions
+        echo "=== Testing user setup ==="
+        podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
+          whoami
+          id
+          pwd
+          ls -la /workspace
+        "
+        
+        # Test that we can create files in workspace
+        echo "=== Testing workspace permissions ==="
+        podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
+          echo 'test content' > /workspace/test.txt
+          cat /workspace/test.txt
+          rm /workspace/test.txt
+          echo '✓ Workspace write permissions OK'
+        "
+        
+    - name: Security scan
+      run: |
+        echo "=== Running basic security checks ==="
+        # Check that we're not running as root
+        podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest bash -c "
+          if [ \$(id -u) -eq 0 ]; then
+            echo '❌ Container is running as root'
+            exit 1
+          else
+            echo '✓ Container is running as non-root user'
+          fi
+        "
+        
+    - name: Performance test
+      run: |
+        echo "=== Testing container startup time ==="
+        time podman run --cgroup-manager=cgroupfs --rm ci-container-test:latest echo "Container started successfully"

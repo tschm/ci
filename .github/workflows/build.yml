@@ -1,0 +1,49 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Podman
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y podman
+        
+    - name: Build image with Podman
+      run: |
+        podman build --cgroup-manager=cgroupfs -t ci-container:${{ github.sha }} .
+        
+    - name: Test image basic functionality
+      run: |
+        # Test that the container starts and basic tools are available
+        podman run --cgroup-manager=cgroupfs --rm ci-container:${{ github.sha }} which python3
+        podman run --cgroup-manager=cgroupfs --rm ci-container:${{ github.sha }} which node
+        podman run --cgroup-manager=cgroupfs --rm ci-container:${{ github.sha }} which git
+        podman run --cgroup-manager=cgroupfs --rm ci-container:${{ github.sha }} which curl
+        
+    - name: Test Python packages
+      run: |
+        podman run --cgroup-manager=cgroupfs --rm ci-container:${{ github.sha }} python3 -c "import pytest, requests, yaml; print('Python packages OK')"
+        
+    - name: Save image for potential release
+      if: github.ref == 'refs/heads/main'
+      run: |
+        podman save ci-container:${{ github.sha }} | gzip > ci-container-${{ github.sha }}.tar.gz
+        
+    - name: Upload image artifact
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-artifact@v4
+      with:
+        name: ci-container-image
+        path: ci-container-${{ github.sha }}.tar.gz
+        retention-days: 30
