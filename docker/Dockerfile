@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y \
     ca-certificates
 
 # Install uv/uvx by copying prebuilt binaries (pinned)
-RUN COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /usr/local/bin \
+COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /usr/local/bin \
     && uv --version && uvx --version
 
 # Install tectonic
