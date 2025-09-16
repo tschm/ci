@@ -13,7 +13,7 @@ RUN apt-get update && \
       git \
       bash \
       sed \
-      awk \
+      gawk \
       findutils \
       python3 \
       python3-pip \
