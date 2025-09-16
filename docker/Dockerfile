@@ -31,6 +31,10 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
+# Install uv/uvx
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
+    && export PATH="/root/.local/bin:$PATH"
+
 # Install common Python packages for CI/CD
 # Using trusted hosts to handle SSL issues in some environments
 RUN pip3 install --no-cache-dir --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
