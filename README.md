@@ -38,6 +38,7 @@ This repository also includes a manual release workflow that creates a Git tag, 
 - Creates a GitHub release with automatically generated release notes
 - Includes Docker artifacts in the release
 - Adds Docker image information to the release notes, including the image URL and pull command
+- Requires `packages: write` permission to push images to GitHub Container Registry
 
 To use the release workflow:
 

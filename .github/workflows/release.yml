@@ -10,7 +10,7 @@ on:
 
 permissions:
   contents: write  # Needed to create releases
-  id-token: write  # Needed for OIDC authentication with PyPI
+  packages: write  # Needed to push to GitHub Container Registry
 
 jobs:
   tag:
