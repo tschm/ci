@@ -45,7 +45,7 @@ RUN mkdir -p /usr/local/bin && chmod 755 /usr/local/bin
 # Install uv package manager
 COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /usr/local/bin/
 RUN chmod +x /usr/local/bin/uv \
-    chmod +x /usr/local/bin/uvx \
+    && chmod +x /usr/local/bin/uvx \
     && uv --version && uvx --version \
 
 # Create a non-root user for security
