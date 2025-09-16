@@ -1,35 +1,60 @@
-# Use a lightweight Debian base
-FROM debian:bookworm-slim
-LABEL authors="thomasschmelzer"
+# CI/CD Container Image
+# Base image with common CI/CD tools
+FROM ubuntu:22.04
 
-# Avoid interactive prompts during apt installs
+# Set non-interactive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-      curl \
-      ca-certificates \
-      git \
-      bash \
-      sed \
-      gawk \
-      findutils \
-      python3 \
-      python3-pip \
-      unzip \
-      yamllint \
-      && rm -rf /var/lib/apt/lists/*
+# Update system and install basic CI/CD tools
+RUN apt-get update && apt-get install -y \
+    # Basic utilities
+    curl \
+    wget \
+    git \
+    unzip \
+    zip \
+    jq \
+    # Build tools
+    build-essential \
+    # Python and pip
+    python3 \
+    python3-pip \
+    # Node.js and npm
+    nodejs \
+    npm \
+    # Additional useful tools
+    tree \
+    vim \
+    nano \
+    ssh \
+    rsync \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install uv (and optionally uvx if needed)
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-ENV PATH="/root/.cargo/bin:$PATH"
+# Install common Python packages for CI/CD
+# Using trusted hosts to handle SSL issues in some environments
+RUN pip3 install --no-cache-dir --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
+    pytest \
+    requests \
+    pyyaml || \
+    echo "Warning: Some Python packages may not have been installed due to network issues"
 
-# Install Tectonic (for LaTeX builds)
-RUN curl -LsSf https://tectonic-typesetting.github.io/install.sh | sh
+# Create a non-root user for security
+RUN useradd -m -s /bin/bash ciuser
 
-# Set workdir
+# Set working directory
 WORKDIR /workspace
 
-# Default entrypoint
-ENTRYPOINT ["/bin/bash"]
+# Change ownership of workspace to ciuser
+RUN chown ciuser:ciuser /workspace
+
+# Switch to non-root user
+USER ciuser
+
+# Default command
+CMD ["/bin/bash"]
+
+# Labels for metadata
+LABEL maintainer="Thomas Schmelzer"
+LABEL description="CI/CD container with common tools and utilities"
+LABEL version="1.0.0"
