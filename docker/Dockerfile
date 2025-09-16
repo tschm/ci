@@ -43,9 +43,9 @@ RUN pip3 install --no-cache-dir --trusted-host pypi.org --trusted-host pypi.pyth
 RUN mkdir -p /usr/local/bin && chmod 755 /usr/local/bin
 
 # Install uv package manager
-COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /usr/local/bin/
-RUN chmod +x /usr/local/bin/uv /usr/local/bin/uvx && \
-    uv --version && uvx --version
+COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /usr/local/bin/
+RUN chmod +x /usr/local/bin/uv && \
+    uv --version
 
 # Create a non-root user for security
 RUN useradd -m -s /bin/bash ciuser
