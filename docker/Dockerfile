@@ -1,6 +1,6 @@
 # CI/CD Container Image
 # Base image with common CI/CD tools
-FROM ubuntu:22.04
+FROM ubuntu:24.04
 
 # Set non-interactive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
