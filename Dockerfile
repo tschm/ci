@@ -18,6 +18,7 @@ RUN apt-get update && \
       python3 \
       python3-pip \
       unzip \
+      yamllint \
       && rm -rf /var/lib/apt/lists/*
 
 # Install uv (and optionally uvx if needed)
