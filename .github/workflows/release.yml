@@ -1,0 +1,80 @@
+name: Release Workflow
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (e.g. v1.2.3)'
+        required: true
+        type: string
+
+permissions:
+  contents: write  # Needed to create releases
+  id-token: write  # Needed for OIDC authentication with PyPI
+
+jobs:
+  tag:
+    name: Create Git Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Create Git Tag
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          git tag ${{ github.event.inputs.tag }}
+          git push origin ${{ github.event.inputs.tag }}
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: tag
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Build the Docker image
+        uses: ./.github/actions/docker
+        with:
+          github_actor: ${{ github.actor }}
+          github_repository: ${{ github.repository }}/ci-image
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.event.inputs.tag }}
+          dockerfiles: 'docker/Dockerfile'
+          registry: ghcr.io
+
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [tag, build]
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Generate Docker Image Info
+        id: image-info
+        run: |
+          echo "IMAGE_URL=ghcr.io/${{ github.repository }}/ci-image:${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
+          echo "## Docker Image" > docker-image-info.md
+          echo "The Docker image for this release is available at:" >> docker-image-info.md
+          echo "\`\`\`" >> docker-image-info.md
+          echo "ghcr.io/${{ github.repository }}/ci-image:${{ github.event.inputs.tag }}" >> docker-image-info.md
+          echo "\`\`\`" >> docker-image-info.md
+          echo "You can pull it with:" >> docker-image-info.md
+          echo "\`\`\`bash" >> docker-image-info.md
+          echo "docker pull ghcr.io/${{ github.repository }}/ci-image:${{ github.event.inputs.tag }}" >> docker-image-info.md
+          echo "\`\`\`" >> docker-image-info.md
+
+      - name: Create GitHub Release with artifacts
+        uses: softprops/action-gh-release@v2.3.2
+        with:
+          tag_name: ${{ github.event.inputs.tag }}
+          name: ${{ github.event.inputs.tag }}
+          generate_release_notes: true
+          body_path: docker-image-info.md
+          files: "docker/**"
