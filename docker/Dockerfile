@@ -30,9 +30,9 @@ RUN apt-get update && apt-get install -y \
     rsync \
     ca-certificates
 
-# Install uv/uvx
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh \
-    && export PATH="/root/.local/bin:$PATH"
+# Install uv/uvx by copying prebuilt binaries (pinned)
+RUN COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /usr/local/bin \
+    && uv --version && uvx --version
 
 # Install tectonic
 RUN apt-get install -y --no-install-recommends \
