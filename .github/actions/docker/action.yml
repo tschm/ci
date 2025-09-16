@@ -39,6 +39,11 @@ inputs:
     required: false
     default: ''  # Empty string as default for optional labels
 
+  version:
+    description: 'Version to inject into the image (will be used for the version label)'
+    required: false
+    default: 'dev'  # Default version if not specified
+
 runs:
   using: "composite"  # Composite actions combine multiple steps
   steps:
@@ -61,6 +66,8 @@ runs:
         tags: ${{ inputs.tag }}  # Tags to apply to the image
         dockerfiles: ${{ inputs.dockerfiles }}  # Path to the Dockerfile
         labels: ${{ inputs.labels }}  # Labels to apply to the image
+        build-args: |
+          VERSION=${{ inputs.version || inputs.tag }}
 
     # Step 3: Push the built image to the container registry
     # This uploads the image to make it available for deployment

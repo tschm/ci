@@ -7,22 +7,22 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Update system and install basic CI/CD tools
 RUN apt-get update && apt-get install -y \
-    # Basic utilities
+    # Basic utilities \
     curl \
     wget \
     git \
     unzip \
     zip \
     jq \
-    # Build tools
+    # Build tools \
     build-essential \
-    # Python and pip
+    # Python and pip \
     python3 \
     python3-pip \
-    # Node.js and npm
+    # Node.js and npm \
     nodejs \
     npm \
-    # Additional useful tools
+    # Additional useful tools \
     tree \
     vim \
     nano \
@@ -80,7 +80,10 @@ ENV PATH="/usr/local/bin:${PATH}"
 # Default command
 CMD ["/bin/bash"]
 
+# Build arguments for version
+ARG VERSION="dev"
+
 # Labels for metadata
 LABEL maintainer="Thomas Schmelzer"
 LABEL description="CI/CD container with common tools and utilities"
-#LABEL version="1.0.0"
+LABEL version="${VERSION}"

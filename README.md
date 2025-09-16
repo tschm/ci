@@ -8,6 +8,7 @@ A container image for CI/CD operations with various tools pre-installed.
 - Includes Python, uv package manager, and Tectonic for LaTeX builds
 - YAML linting with yamllint
 - Various utilities for build and automation tasks
+- Version label automatically injected during CI/CD build process
 
 ## GitHub Workflows
 
@@ -26,7 +27,7 @@ To use the workflow:
 1. The workflow runs automatically when changes are made to the Dockerfile
 2. You can manually trigger it from the Actions tab in GitHub
 3. To publish the image to the registry, create and push a tag that starts with 'v' (e.g., `git tag v1.0.0 && git push origin v1.0.0`)
-4. When a tag is pushed, the image will be tagged with the specific version (e.g., v1.0.0)
+4. When a tag is pushed, the image will be tagged with the specific version (e.g., v1.0.0) and the version label will be automatically set to the tag value
 
 ### Release Workflow
 
@@ -35,6 +36,7 @@ This repository also includes a manual release workflow that creates a Git tag, 
 - Can be manually triggered using workflow_dispatch with a tag input
 - Creates a Git tag based on the provided input
 - Builds and publishes the Docker image with the specified tag to GitHub Container Registry (GHCR)
+- Automatically injects the tag as the version label in the Docker image
 - Creates a GitHub release with automatically generated release notes
 - Includes Docker artifacts in the release
 - Adds Docker image information to the release notes, including the image URL and pull command
@@ -47,3 +49,17 @@ To use the release workflow:
 3. The workflow will create the Git tag, build and publish the Docker image, and create a GitHub release
 4. The Docker image will be available at `ghcr.io/{repository}/ci-image:{tag}` and can be pulled with `docker pull ghcr.io/{repository}/ci-image:{tag}`
 5. The GitHub release will include a section with the Docker image URL and pull command
+
+## Building Locally
+
+To build the Docker image locally with a custom version:
+
+```bash
+# Build with a specific version
+docker build -t ci-image:custom --build-arg VERSION="1.2.3" ./docker
+
+# Verify the version label
+docker inspect ci-image:custom --format='{{.Config.Labels.version}}'
+```
+
+The VERSION build argument will be injected as the version label in the Docker image. If not specified, it defaults to "dev".
