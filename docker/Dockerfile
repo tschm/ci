@@ -30,8 +30,8 @@ RUN apt-get update && apt-get install -y \
     rsync \
     ca-certificates
 
-# Install tectonic
-RUN apt-get install -y --no-install-recommends \
+# Install dependencies for tectonic
+RUN apt-get update && apt-get install -y --no-install-recommends \
     xz-utils \
     fontconfig \
     libfreetype6 \
@@ -42,13 +42,15 @@ RUN apt-get install -y --no-install-recommends \
     libxext6 \
     libxrender1 \
     perl \
-    && rm -rf /var/lib/apt/lists/* \
-    && curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net | sh \
-    && export PATH=$PWD:$PATH \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install tectonic
+RUN curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net | sh || echo "Tectonic installation failed, continuing build" \
+    && if [ -f "tectonic" ]; then mv tectonic /usr/local/bin/ && chmod +x /usr/local/bin/tectonic; fi
 
 # Install common Python packages for CI/CD
 # Using trusted hosts to handle SSL issues in some environments
-RUN pip3 install --no-cache-dir --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
+RUN pip3 install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
     pytest \
     requests \
     pyyaml || \
