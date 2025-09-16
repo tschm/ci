@@ -40,7 +40,8 @@ RUN pip3 install --no-cache-dir --trusted-host pypi.org --trusted-host pypi.pyth
     echo "Warning: Some Python packages may not have been installed due to network issues"
 
 # Ensure /usr/local/bin exists (normally already present in most bases)
-RUN mkdir -p /usr/local/bin && chmod 755 /usr/local/bin
+# RUN mkdir -p /usr/local/bin && chmod 755 /usr/local/bin
+
 
 # Install uv and uvx from astral-sh image
 COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /usr/local/bin/
