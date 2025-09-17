@@ -1,6 +1,6 @@
 # CI/CD Container Image
 # Base image with common CI/CD tools
-FROM python:3.12-slim-bookworm
+FROM python:3.13-slim-bookworm
 
 # Set non-interactive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
