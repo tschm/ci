@@ -20,7 +20,6 @@ docker run --rm ci-container:latest bash -c "
     which git && echo '✓ Git found'
     which curl && echo '✓ Curl found'
     which jq && echo '✓ JQ found'
-    which tectonic && echo '✓ tectonic found'
 "
 
 echo "  Testing Python packages..."

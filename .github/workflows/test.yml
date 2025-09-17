@@ -38,7 +38,6 @@ jobs:
           which git && echo '✓ Git found'
           which curl && echo '✓ Curl found'
           which jq && echo '✓ JQ found'
-          which tectonic && echo '✓ tectonic found'
         "
 
         # Test Python environment
