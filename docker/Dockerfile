@@ -1,6 +1,6 @@
 # CI/CD Container Image
 # Base image with common CI/CD tools
-FROM ubuntu:22.04
+FROM python:3.12-slim-bookworm
 
 # Set non-interactive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
@@ -15,10 +15,7 @@ RUN apt-get update && apt-get install -y \
     zip \
     jq \
     # Build tools \
-    build-essential \
-    # Python and pip \
-    python3 \
-    python3-pip \
+    # build-essential \
     # Node.js and npm \
     nodejs \
     npm \
@@ -29,24 +26,6 @@ RUN apt-get update && apt-get install -y \
     ssh \
     rsync \
     ca-certificates
-
-# Install dependencies for tectonic
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    xz-utils \
-    fontconfig \
-    libfreetype6 \
-    libgraphite2-3 \
-    libharfbuzz0b \
-    libpng16-16 \
-    libx11-6 \
-    libxext6 \
-    libxrender1 \
-    perl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install tectonic
-RUN curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net | sh || echo "Tectonic installation failed, continuing build" \
-    && if [ -f "tectonic" ]; then mv tectonic /usr/local/bin/ && chmod +x /usr/local/bin/tectonic; fi
 
 # Install common Python packages for CI/CD
 # Using trusted hosts to handle SSL issues in some environments
