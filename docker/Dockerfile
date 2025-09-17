@@ -24,7 +24,7 @@ RUN apt-get update && apt-get install -y \
     npm \
     # Additional useful tools \
     tree \
-    vim \
+    # vim \
     nano \
     ssh \
     rsync \
@@ -53,7 +53,8 @@ RUN curl --proto '=https' --tlsv1.2 -fsSL https://drop-sh.fullyjustified.net | s
 RUN pip3 install --trusted-host pypi.org --trusted-host pypi.python.org --trusted-host files.pythonhosted.org \
     pytest \
     requests \
-    pyyaml || \
+    pyyaml \
+    pre-commit || \
     echo "Warning: Some Python packages may not have been installed due to network issues"
 
 # Install uv and uvx from astral-sh image

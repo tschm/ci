@@ -1,12 +1,13 @@
 # CI/CD Container
 
-A container image for CI/CD operations with various tools pre-installed.
+A container image for GitLab CI/CD operations with various tools pre-installed. This image is designed to be used as a base image for GitLab CI/CD pipelines.
 
 ## Features
 
 - Based on Debian bookworm-slim
 - Includes Python, uv package manager, and Tectonic for LaTeX builds
 - YAML linting with yamllint
+- Pre-commit support with initialized Git repository in workspace
 - Various utilities for build and automation tasks
 - Version label automatically injected during CI/CD build process
 
@@ -63,3 +64,55 @@ docker inspect ci-image:custom --format='{{.Config.Labels.version}}'
 ```
 
 The VERSION build argument will be injected as the version label in the Docker image. If not specified, it defaults to "dev".
+
+## Using with GitLab CI/CD
+
+This container is specifically designed to be used as a base image for GitLab CI/CD pipelines. A sample `.gitlab-ci.yml` file is included in the repository to help you get started.
+
+### Sample GitLab CI/CD Configuration
+
+To use this image in your GitLab CI/CD pipeline, specify it in your `.gitlab-ci.yml` file:
+
+```yaml
+image: ghcr.io/tschm/ci/ci-image:latest
+
+stages:
+  - test
+  - build
+  - deploy
+
+# Example test job using pytest
+test:
+  stage: test
+  script:
+    - python3 -m pytest -v
+
+# More jobs as needed...
+```
+
+### Benefits for GitLab CI/CD
+
+- **Pre-installed tools**: Reduces pipeline setup time with Python, Node.js, and common build tools
+- **Consistent environment**: Ensures all CI/CD jobs run in the same environment
+- **Non-root user**: Runs as a non-root user for improved security
+- **Caching support**: Configured for efficient dependency caching in GitLab pipelines
+
+### Best Practices
+
+1. Use specific version tags (e.g., `ghcr.io/tschm/ci/ci-image:v1.0.0`) rather than `latest` for reproducible builds
+2. Leverage GitLab CI/CD caching to speed up your pipelines
+3. Consider extending this image with additional tools specific to your project
+
+## Using Pre-commit
+
+The container comes with pre-commit installed and a Git repository initialized in the workspace directory. This allows you to run pre-commit hooks directly:
+
+```bash
+# Run pre-commit on all files
+docker run -it ghcr.io/tschm/ci/ci-image:latest uvx pre-commit run --all-files
+
+# Mount your local directory to use pre-commit on your code
+docker run -it -v $(pwd):/workspace ghcr.io/tschm/ci/ci-image:latest bash -c "cd /workspace && uvx pre-commit run --all-files"
+```
+
+You can customize the pre-commit configuration by mounting your own `.pre-commit-config.yaml` file or modifying the default one in the container.
