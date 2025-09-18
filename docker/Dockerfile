@@ -37,7 +37,7 @@ RUN pip3 install --trusted-host pypi.org --trusted-host pypi.python.org --truste
     echo "Warning: Some Python packages may not have been installed due to network issues"
 
 # Install uv and uvx from astral-sh image
-COPY --from=ghcr.io/astral-sh/uv:0.8.17 /uv /uvx /usr/local/bin/
+COPY --from=ghcr.io/astral-sh/uv:0.8.18 /uv /uvx /usr/local/bin/
 
 # Verify installation
 RUN uv --version && uvx --version
