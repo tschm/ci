@@ -1,31 +1,36 @@
 # CI/CD Container Image
 # Base image with common CI/CD tools
-FROM python:3.12-slim-bookworm
+FROM ghcr.io/astral-sh/uv:0.9.4-python3.12-trixie
 
 # Set non-interactive mode for apt
 ENV DEBIAN_FRONTEND=noninteractive
 
 # Update system and install basic CI/CD tools
-RUN apt-get update && apt-get install -y \
-    # Basic utilities \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    git \
+    ssh \
+    rsync \
     curl \
     wget \
-    git \
     unzip \
     zip \
     jq \
-    # Build tools \
-    # build-essential \
-    # Node.js and npm \
-    nodejs \
-    npm \
-    # Additional useful tools \
-    tree \
-    # vim \
     nano \
-    ssh \
-    rsync \
-    ca-certificates
+    tree \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Optional: Install lightweight Node via official script (smaller than apt)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get update && \
+    apt-get install -y --no-install-recommends nodejs && \
+    rm -rf /var/lib/apt/lists/*
+
+    
+
+# Install Task
+curl -fsSL https://taskfile.dev/install.sh | sh -s -- -d -b /usr/local/bin
 
 # Install common Python packages for CI/CD
 # Using trusted hosts to handle SSL issues in some environments
@@ -35,12 +40,6 @@ RUN pip3 install --trusted-host pypi.org --trusted-host pypi.python.org --truste
     pyyaml \
     pre-commit || \
     echo "Warning: Some Python packages may not have been installed due to network issues"
-
-# Install uv and uvx from astral-sh image
-COPY --from=ghcr.io/astral-sh/uv:0.9.4 /uv /uvx /usr/local/bin/
-
-# Verify installation
-RUN uv --version && uvx --version
 
 # Create a non-root user for security
 RUN useradd -m -s /bin/bash ciuser
