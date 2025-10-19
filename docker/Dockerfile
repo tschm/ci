@@ -10,12 +10,12 @@ ENV DEBIAN_FRONTEND=noninteractive
 # -------------------------------------------------
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        git \
-        ssh \
+        #git \
+        #ssh \
         rsync \
-        curl \
-        wget \
-        unzip \
+        #curl \
+        #wget \
+        #unzip \
         zip \
         jq \
         nano \
