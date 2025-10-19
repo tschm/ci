@@ -27,10 +27,8 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
     apt-get install -y --no-install-recommends nodejs && \
     rm -rf /var/lib/apt/lists/*
 
-    
-
 # Install Task
-curl -fsSL https://taskfile.dev/install.sh | sh -s -- -d -b /usr/local/bin
+RUN curl -fsSL https://taskfile.dev/install.sh | sh -s -- -d -b /usr/local/bin
 
 # Install common Python packages for CI/CD
 # Using trusted hosts to handle SSL issues in some environments
