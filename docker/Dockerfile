@@ -64,5 +64,3 @@ LABEL description="CI/CD container with common tools and utilities"
 LABEL version="${VERSION}"
 
 CMD ["/bin/bash"]
-
-CMD ["/bin/bash"]
