@@ -1,4 +1,4 @@
-# ============================================
+d# ============================================
 # CI/CD Container Image - Optimized & Secure
 # ============================================
 FROM ghcr.io/astral-sh/uv:0.9.4-python3.12-trixie
@@ -39,7 +39,7 @@ RUN curl -fsSL https://taskfile.dev/install.sh | sh -s -- -d -b /usr/local/bin
 # -------------------------------------------------
 # Step 4: Minimal Python CI Tools (via uv pip)
 # -------------------------------------------------
-RUN uv pip install \
+RUN uv pip install --system \
         pytest \
         requests \
         pyyaml \
