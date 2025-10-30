@@ -1,7 +1,7 @@
 # ============================================
 # CI/CD Container Image - Optimized & Secure
 # ============================================
-FROM ghcr.io/astral-sh/uv:0.9.5-python3.12-trixie
+FROM ghcr.io/astral-sh/uv:0.9.6-python3.12-trixie
 
 ENV DEBIAN_FRONTEND=noninteractive
 
