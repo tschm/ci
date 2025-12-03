@@ -4,8 +4,8 @@
 
 set -e
 
-echo "🔨 Building CI/CD container..."
-docker build -t ci-container:latest ./docker
+echo "🔨 Building CI/CD container with docker buildx..."
+docker buildx build --load -t ci-container:latest ./docker
 
 echo ""
 echo "✅ Build completed successfully!"
@@ -19,7 +19,6 @@ docker run --rm ci-container:latest bash -c "
     which node && echo '✓ Node.js found'
     which git && echo '✓ Git found'
     which curl && echo '✓ Curl found'
-    which jq && echo '✓ JQ found'
 "
 
 echo "  Testing Python packages..."

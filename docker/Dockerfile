@@ -12,7 +12,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         rsync \
         zip \
-        jq \
         nano \
         tree \
         ca-certificates && \
@@ -44,7 +43,9 @@ RUN uv pip install --system \
 # -------------------------------------------------
 # Step 5: Add Secure CI User
 # -------------------------------------------------
-RUN useradd -m -s /bin/bash ciuser
+RUN useradd -m -s /bin/bash ciuser && \
+    mkdir -p /workspace && \
+    chown -R ciuser:ciuser /workspace
 
 # Default workspace
 WORKDIR /workspace
