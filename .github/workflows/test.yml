@@ -37,7 +37,6 @@ jobs:
           which npm && echo '✓ NPM found'
           which git && echo '✓ Git found'
           which curl && echo '✓ Curl found'
-          which jq && echo '✓ JQ found'
         "
 
         # Test Python environment
